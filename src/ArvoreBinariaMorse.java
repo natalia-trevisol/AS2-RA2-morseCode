@@ -1,125 +1,106 @@
+// Classe que representa a árvore binária do código Morse
 public class ArvoreBinariaMorse {
-    Nodo raiz;
+    Nodo raiz; // Nó raiz da árvore
 
+    // Construtor inicializa a árvore com um nó raiz vazio
     public ArvoreBinariaMorse() {
-        raiz = new Nodo(""); // raiz vazia
+        raiz = new Nodo(""); // raiz sem caractere definido
     }
 
-    // Inserção de caractere com base no código Morse
+    // Inserção de um caractere na árvore usando seu código Morse
     public void inserir(String codigo, String caractere) {
         Nodo atual = raiz;
+
+        // Percorre cada símbolo do código Morse
         for (int i = 0; i < codigo.length(); i++) {
             char simbolo = codigo.charAt(i);
-            if (simbolo == '.') {
-                if (atual.esquerda == null) {
+            if (simbolo == '.') { // ponto representa filho esquerdo
+                if (atual.esquerda == null) { // se não existe, cria
                     atual.esquerda = new Nodo("");
                 }
                 atual = atual.esquerda;
-            } else if (simbolo == '-') {
-                if (atual.direita == null) {
+            } else if (simbolo == '-') { // traço representa filho direito
+                if (atual.direita == null) { // se não existe, cria
                     atual.direita = new Nodo("");
                 }
                 atual = atual.direita;
             }
         }
+
+        // Atribui o caractere ao nó final
         atual.caractere = caractere;
     }
 
-    // Busca o caractere pelo código Morse
+    // Busca um caractere a partir do código Morse
     public String buscar(String codigo) {
         Nodo atual = raiz;
+
+        // Percorre a árvore conforme os símbolos
         for (int i = 0; i < codigo.length(); i++) {
             char simbolo = codigo.charAt(i);
-            if (simbolo == '.') {
-                atual = atual.esquerda;
-            } else if (simbolo == '-') {
-                atual = atual.direita;
-            }
-            if (atual == null) {
-                return "";
-            }
+            if (simbolo == '.') atual = atual.esquerda;
+            else if (simbolo == '-') atual = atual.direita;
+
+            // Se nó não existe, código não encontrado
+            if (atual == null) return "";
         }
-        return atual.caractere;
+
+        return atual.caractere; // retorna o caractere encontrado
     }
 
-    // Busca mensagem completa
+    // Busca mensagem completa em Morse e traduz para texto
     public String buscarMensagem(String mensagem) {
-        String[] partes = mensagem.split(" ");
+        String[] partes = mensagem.split(" "); // separa cada código Morse
         String resultado = "";
+
         for (int i = 0; i < partes.length; i++) {
-            if (!partes[i].equals("")) {
-                resultado += buscar(partes[i]);
+            if (!partes[i].equals("")) { // evita códigos vazios
+                resultado += buscar(partes[i]); // busca cada código
             } else {
-                resultado += " ";
+                resultado += " "; // espaço entre palavras
             }
         }
+
         return resultado;
     }
 
-    // Remover caractere
+    // Remove um caractere da árvore
     public void remover(String codigo) {
         removerRec(raiz, codigo, 0);
     }
 
+    // Função recursiva para remoção de nó
     private Nodo removerRec(Nodo atual, String codigo, int i) {
         if (atual == null) return null;
 
+        // Quando chega no nó final, limpa o caractere
         if (i == codigo.length()) {
             atual.caractere = "";
             return atual;
         }
 
         char simbolo = codigo.charAt(i);
-        if (simbolo == '.') {
-            atual.esquerda = removerRec(atual.esquerda, codigo, i + 1);
-        } else if (simbolo == '-') {
-            atual.direita = removerRec(atual.direita, codigo, i + 1);
-        }
+        if (simbolo == '.') atual.esquerda = removerRec(atual.esquerda, codigo, i + 1);
+        else if (simbolo == '-') atual.direita = removerRec(atual.direita, codigo, i + 1);
+
         return atual;
     }
 
-    // Exibir árvore hierarquicamente
-    /* public void exibirArvore() {
-        exibirArvoreRec(raiz, 0);
-    }
-
-    private void exibirArvoreRec(Nodo atual, int nivel) {
-        if (atual == null) return;
-
-        // Exibe primeiro o filho direito (para o lado)
-        exibirArvoreRec(atual.direita, nivel + 1);
-
-        // Espaços para mostrar hierarquia
-        for (int i = 0; i < nivel; i++) {
-            System.out.print("      ");
-        }
-
-        // Exibe o caractere do nó (somente se não for nulo)
-        if (atual.caractere != null && !atual.caractere.equals("")) {
-            System.out.println("(" + atual.caractere + ")");
-        } else {
-            System.out.println("( )"); // pode remover se quiser ocultar nós vazios
-        }
-
-        // Exibe o filho esquerdo
-        exibirArvoreRec(atual.esquerda, nivel + 1);
-    }
-
-     */
-
+    // Exibe a árvore horizontalmente em console
     public void exibirArvore() {
-        int h = altura(raiz);
-        int cols = pow2(h) * 1; // 3 é o espaçamento do nó
+        int h = altura(raiz); // altura da árvore
+        int cols = pow2(h);   // largura da matriz baseada na altura
         String[][] mat = new String[h][cols];
 
-        // Inicializa a matriz com espaços
+        // Inicializa matriz com espaços
         for (int i = 0; i < h; i++)
             for (int j = 0; j < cols; j++)
                 mat[i][j] = "   ";
 
+        // Preenche a matriz com os valores da árvore
         preencherMatriz(raiz, mat, 0, cols / 2, cols / 4);
 
-        // Imprime linha por linha
+        // Imprime a matriz linha por linha
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < cols; j++) {
                 System.out.print(mat[i][j]);
@@ -128,9 +109,14 @@ public class ArvoreBinariaMorse {
         }
     }
 
+    // Preenche a matriz recursivamente com os nós
     private void preencherMatriz(Nodo n, String[][] mat, int linha, int col, int offset) {
         if (n == null) return;
+
+        // Coloca o caractere no formato (X) ou espaço se vazio
         mat[linha][col] = "(" + (n.caractere.equals("") ? " " : n.caractere) + ")";
+
+        // Chamada recursiva para os filhos, ajustando posição horizontal
         if (linha + 1 < mat.length) {
             if (n.esquerda != null)
                 preencherMatriz(n.esquerda, mat, linha + 1, col - offset, offset / 2);
@@ -139,6 +125,7 @@ public class ArvoreBinariaMorse {
         }
     }
 
+    // Calcula a altura da árvore recursivamente
     private int altura(Nodo n) {
         if (n == null) return 0;
         int e = altura(n.esquerda);
@@ -146,50 +133,54 @@ public class ArvoreBinariaMorse {
         return 1 + (e > d ? e : d);
     }
 
+    // Calcula potência de 2 (2^n) sem usar bibliotecas externas
     private int pow2(int n) {
         int r = 1;
         for (int i = 0; i < n; i++) r *= 2;
         return r;
     }
 
-
-    // Buscar código Morse a partir de uma letra
+    // Busca código Morse a partir de uma letra
     public String buscarCodigo(String letra) {
         return buscarCodigoRec(raiz, letra, "");
     }
 
+    // Função recursiva para encontrar caminho da letra
     private String buscarCodigoRec(Nodo atual, String letra, String caminho) {
         if (atual == null) return "";
-        if (atual.caractere.equals(letra)) return caminho;
+        if (atual.caractere.equals(letra)) return caminho; // letra encontrada
 
+        // Busca no filho esquerdo (.)
         String esq = buscarCodigoRec(atual.esquerda, letra, caminho + ".");
         if (!esq.equals("")) return esq;
 
+        // Busca no filho direito (-)
         String dir = buscarCodigoRec(atual.direita, letra, caminho + "-");
         if (!dir.equals("")) return dir;
 
-        return "";
+        return ""; // não encontrou
     }
 
+    // Traduz mensagem de texto para código Morse
     public String traduzirMensagemParaMorse(String mensagem) {
         String resultado = "";
+
         for (int i = 0; i < mensagem.length(); i++) {
             char c = mensagem.charAt(i);
 
             if (c == ' ') {
-                // separa palavras
-                resultado = resultado + " / ";
+                resultado = resultado + " / "; // separador de palavras
             } else {
-                String codigo = buscarCodigo("" + c);
+                String codigo = buscarCodigo("" + c); // busca código do caractere
                 if (codigo != null) {
                     resultado = resultado + codigo + " ";
                 } else {
-                    resultado = resultado + "? ";
+                    resultado = resultado + "? "; // caractere não encontrado
                 }
             }
         }
 
-        // remove espaços extras no final manualmente
+        // Remove o último espaço extra manualmente
         String ajustado = "";
         for (int i = 0; i < resultado.length(); i++) {
             if (!(i == resultado.length() - 1 && resultado.charAt(i) == ' ')) {
@@ -199,5 +190,4 @@ public class ArvoreBinariaMorse {
 
         return ajustado;
     }
-
 }
