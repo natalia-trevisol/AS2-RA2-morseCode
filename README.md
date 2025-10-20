@@ -85,16 +85,17 @@ Contém o **menu interativo** e permite que o usuário interaja com a árvore:
 - **2:** Permite inserir manualmente um novo caractere com código Morse;  
 - **3:** Busca o caractere correspondente a um código Morse digitado;  
 - **4:** Busca o código Morse correspondente a um caractere digitado;  
-- **5:** Exibe a árvore na forma hierárquica vertical ou horizontal;  
+- **5:** Exibe a árvore na forma hierárquica horizontalmente;  
 - **6:** Traduz mensagens de Morse para texto (separadas por espaços);  
 - **7:** Traduz mensagens de texto para código Morse;  
-- **8:** Remove um caractere da árvore (digitando o caractere ou código Morse);  
+- **8:** Remove um caractere da árvore (digitando o caractere);  
 - **0:** Encerra o programa.
 
 ---
 
 ## Estrutura do Código
 ```bash
+AS2-RA2-morseCode
 src/
 │
 ├── Main.java # Menu principal e interação com o usuário
@@ -112,17 +113,40 @@ src/
 - IDE de sua preferência (IntelliJ, Eclipse, NetBeans) ou terminal com `javac` e `java`.
 
 ### Execução via terminal
-1. Compilar os arquivos:
+
+1. **Baixar os arquivos do diretório src/:**
+  
+  - Main.java
+  - ArvoreBinariaMorse.java
+  - Nodo.java
+   
+1. **Compilar os arquivos:**
 ```bash
 javac *.java
 ```
 
-2. Executar o programa:
+2. **Executar o programa:**
 ```bash
 java Main
 ```
 
 3. Interagir com o menu digitando o número da opção desejada.
+
+### Execução via IDE
+
+1. **Instalar e abrir algum IDE que suporte Java:**
+
+Por exemplo: InteliJIdea, NetBeans.
+
+2. **Baixar os arquivos do diretório src/:**
+  
+  - Main.java
+  - ArvoreBinariaMorse.java
+  - Nodo.java
+    
+3. **Abrir o diretório src/ no IDE e executar o arquivo "Main.java":**
+   
+Geralmente existe um botão "RUN" para compilar e executar o programa.
 
 --- 
 
@@ -132,7 +156,7 @@ java Main
 - Os caracteres podem ser inseridos manual ou automaticamente;
 - A árvore permite buscas e traduções, usando recursão para percorrer os caminhos de pontos e traços;
 - A remoção apenas apaga o caractere do nó, mantendo a hierarquia intacta;
-- A exibição vertical ou horizontal mostra claramente a estrutura, usando apenas () para representar nós.
+- A exibição horizontal mostra claramente a estrutura, usando apenas () para representar nós.
 
 --- 
 
