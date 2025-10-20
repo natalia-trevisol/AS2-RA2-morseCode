@@ -31,7 +31,7 @@ public class Main {
 
                 case 2: // Inserção manual de um caractere
                     System.out.print("Digite o caractere (A-Z ou 0-9): ");
-                    String c = sc.nextLine().toUpperCase(); // converte para maiúscula
+                    String c = sc.nextLine();
                     System.out.print("Digite o código Morse (ex: .-): ");
                     String codigo = sc.nextLine();
                     arvore.inserir(codigo, c); // insere na árvore
@@ -42,7 +42,7 @@ public class Main {
                     System.out.print("Digite o código Morse: ");
                     String cod = sc.nextLine();
                     String resultado = arvore.buscar(cod); // busca na árvore
-                    if (resultado.equals(""))
+                    if (compararStrings(resultado, "") == 0)
                         System.out.println("Código não encontrado!");
                     else
                         System.out.println("Resultado: " + resultado);
@@ -50,9 +50,9 @@ public class Main {
 
                 case 4: // Busca do código Morse a partir de uma letra
                     System.out.print("Digite a letra: ");
-                    String letra = sc.nextLine().toUpperCase();
+                    String letra = sc.nextLine();
                     String codigoLetra = arvore.buscarCodigo(letra);
-                    if (codigoLetra.equals(""))
+                    if (compararStrings(codigoLetra, "") == 0)
                         System.out.println("Letra não encontrada!");
                     else
                         System.out.println("Código Morse de " + letra + " é: " + codigoLetra);
@@ -71,7 +71,7 @@ public class Main {
 
                 case 7: // Traduz mensagem de texto para código Morse
                     System.out.print("Digite uma mensagem para converter em código Morse: ");
-                    String mensagem = sc.nextLine().toUpperCase();
+                    String mensagem = sc.nextLine();
                     String morse = arvore.traduzirMensagemParaMorse(mensagem);
                     System.out.println("Mensagem em código Morse:");
                     System.out.println(morse);
@@ -79,11 +79,11 @@ public class Main {
 
                 case 8: // Remoção de caractere
                     System.out.print("Digite o caractere (A-Z ou 0-9) a remover: ");
-                    String caractereRemover = sc.nextLine().toUpperCase();
+                    String caractereRemover = sc.nextLine();
 
                     // Busca o código Morse correspondente para remover
                     String codigoRemover = arvore.buscarCodigo(caractereRemover);
-                    if (codigoRemover.equals("")) {
+                    if (compararStrings(codigoRemover, "") == 0) {
                         System.out.println("Caractere não encontrado na árvore!");
                     } else {
                         arvore.remover(codigoRemover); // remove o caractere
@@ -118,8 +118,35 @@ public class Main {
         };
 
         // Insere cada caractere na árvore conforme o código Morse
-        for (int i = 0; i < morse.length; i++) {
+        int linhas = 0;
+        for (String[] s : morse) linhas++; // contar linhas manualmente
+
+        for (int i = 0; i < linhas; i++) {
             arvore.inserir(morse[i][1], morse[i][0]);
         }
+    }
+
+    // Função para comparar strings manualmente (0 = iguais, 1 = diferentes)
+    public static int compararStrings(String a, String b) {
+        if (a == null && b == null) return 0; // ambas nulas = iguais
+        if (a == null || b == null) return 1; // apenas uma é nula = diferentes
+
+        int lenA = a.length();
+        int lenB = b.length();
+
+        if (lenA != lenB) return 1; // tamanhos diferentes = diferentes
+
+        for (int i = 0; i < lenA; i++) {
+            char ca = a.charAt(i);
+            char cb = b.charAt(i);
+
+            // Converte minúsculas para maiúsculas manualmente
+            if (ca >= 'a' && ca <= 'z') ca = (char)(ca - 32);
+            if (cb >= 'a' && cb <= 'z') cb = (char)(cb - 32);
+
+            if (ca != cb) return 1; // caractere diferente
+        }
+
+        return 0; // todas iguais
     }
 }

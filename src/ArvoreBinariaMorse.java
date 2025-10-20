@@ -50,15 +50,35 @@ public class ArvoreBinariaMorse {
 
     // Busca mensagem completa em Morse e traduz para texto
     public String buscarMensagem(String mensagem) {
-        String[] partes = mensagem.split(" "); // separa cada código Morse
-        String resultado = "";
-
-        for (int i = 0; i < partes.length; i++) {
-            if (!partes[i].equals("")) { // evita códigos vazios
-                resultado += buscar(partes[i]); // busca cada código
+        // Divisão manual por espaços
+        String[] partes = new String[1000]; // tamanho máximo arbitrário
+        int count = 0; // número de elementos válidos
+        String temp = "";
+        int i = 0;
+        while (i < mensagem.length()) {
+            char c = mensagem.charAt(i);
+            if (c != ' ') {
+                temp = temp + c;
             } else {
-                resultado += " "; // espaço entre palavras
+                partes[count] = temp;
+                count++;
+                temp = "";
             }
+            i++;
+        }
+        partes[count] = temp;
+        count++;
+
+        // Monta resultado sem usar length de array
+        String resultado = "";
+        int idx = 0;
+        while (idx < count) {
+            if (compararStrings(partes[idx], "") != 0) { // evita códigos vazios
+                resultado = resultado + buscar(partes[idx]); // busca cada código
+            } else {
+                resultado = resultado + " "; // espaço entre palavras
+            }
+            idx++;
         }
 
         return resultado;
@@ -90,22 +110,32 @@ public class ArvoreBinariaMorse {
     public void exibirArvore() {
         int h = altura(raiz); // altura da árvore
         int cols = pow2(h);   // largura da matriz baseada na altura
-        String[][] mat = new String[h][cols];
 
-        // Inicializa matriz com espaços
-        for (int i = 0; i < h; i++)
-            for (int j = 0; j < cols; j++)
+        // Inicializa matriz manualmente sem length
+        String[][] mat = new String[h][cols];
+        int i = 0;
+        while (i < h) {
+            int j = 0;
+            while (j < cols) {
                 mat[i][j] = "   ";
+                j++;
+            }
+            i++;
+        }
 
         // Preenche a matriz com os valores da árvore
         preencherMatriz(raiz, mat, 0, cols / 2, cols / 4);
 
         // Imprime a matriz linha por linha
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < cols; j++) {
+        i = 0;
+        while (i < h) {
+            int j = 0;
+            while (j < cols) {
                 System.out.print(mat[i][j]);
+                j++;
             }
             System.out.println();
+            i++;
         }
     }
 
@@ -114,10 +144,13 @@ public class ArvoreBinariaMorse {
         if (n == null) return;
 
         // Coloca o caractere no formato (X) ou espaço se vazio
-        mat[linha][col] = "(" + (n.caractere.equals("") ? " " : n.caractere) + ")";
+        if (compararStrings(n.caractere, "") == 0) mat[linha][col] = "( )";
+        else mat[linha][col] = "(" + n.caractere + ")";
 
-        // Chamada recursiva para os filhos, ajustando posição horizontal
-        if (linha + 1 < mat.length) {
+        // Chamada recursiva para os filhos
+        // Percorre linha + 1 apenas se não ultrapassar altura máxima conhecida
+        int alturaMax = 7; // valor máximo de linhas da matriz (coloquei 7 por garantia, mas são 6)
+        if (linha + 1 < alturaMax) {
             if (n.esquerda != null)
                 preencherMatriz(n.esquerda, mat, linha + 1, col - offset, offset / 2);
             if (n.direita != null)
@@ -136,7 +169,11 @@ public class ArvoreBinariaMorse {
     // Calcula potência de 2 (2^n) sem usar bibliotecas externas
     private int pow2(int n) {
         int r = 1;
-        for (int i = 0; i < n; i++) r *= 2;
+        int i = 0;
+        while (i < n) {
+            r = r * 2;
+            i++;
+        }
         return r;
     }
 
@@ -148,15 +185,15 @@ public class ArvoreBinariaMorse {
     // Função recursiva para encontrar caminho da letra
     private String buscarCodigoRec(Nodo atual, String letra, String caminho) {
         if (atual == null) return "";
-        if (atual.caractere.equals(letra)) return caminho; // letra encontrada
+        if (compararStrings(atual.caractere, letra) == 0) return caminho; // letra encontrada
 
         // Busca no filho esquerdo (.)
         String esq = buscarCodigoRec(atual.esquerda, letra, caminho + ".");
-        if (!esq.equals("")) return esq;
+        if (compararStrings(esq, "") != 0) return esq;
 
         // Busca no filho direito (-)
         String dir = buscarCodigoRec(atual.direita, letra, caminho + "-");
-        if (!dir.equals("")) return dir;
+        if (compararStrings(dir, "") != 0) return dir;
 
         return ""; // não encontrou
     }
@@ -165,29 +202,52 @@ public class ArvoreBinariaMorse {
     public String traduzirMensagemParaMorse(String mensagem) {
         String resultado = "";
 
-        for (int i = 0; i < mensagem.length(); i++) {
+        int i = 0;
+        while (i < mensagem.length()) {
             char c = mensagem.charAt(i);
 
             if (c == ' ') {
                 resultado = resultado + " / "; // separador de palavras
             } else {
                 String codigo = buscarCodigo("" + c); // busca código do caractere
-                if (codigo != null) {
-                    resultado = resultado + codigo + " ";
-                } else {
-                    resultado = resultado + "? "; // caractere não encontrado
-                }
+                if (compararStrings(codigo, "") != 0) resultado = resultado + codigo + " ";
+                else resultado = resultado + "? "; // caractere não encontrado
             }
+            i++;
         }
 
         // Remove o último espaço extra manualmente
         String ajustado = "";
-        for (int i = 0; i < resultado.length(); i++) {
+        i = 0;
+        while (i < resultado.length()) {
             if (!(i == resultado.length() - 1 && resultado.charAt(i) == ' ')) {
                 ajustado = ajustado + resultado.charAt(i);
             }
+            i++;
         }
 
         return ajustado;
+    }
+
+    // Função auxiliar de comparação manual de strings (0 = iguais, 1 = diferentes)
+    public static int compararStrings(String a, String b) {
+        if (a == null && b == null) return 0;
+        if (a == null || b == null) return 1;
+
+        if (a.length() != b.length()) return 1;
+
+        int i = 0;
+        while (i < a.length()) {
+            char ca = a.charAt(i);
+            char cb = b.charAt(i);
+
+            // Converte minúsculas para maiúsculas manualmente
+            if (ca >= 'a' && ca <= 'z') ca = (char)(ca - 32);
+            if (cb >= 'a' && cb <= 'z') cb = (char)(cb - 32);
+
+            if (ca != cb) return 1;
+            i++;
+        }
+        return 0;
     }
 }
